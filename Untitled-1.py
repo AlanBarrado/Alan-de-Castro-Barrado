@@ -1,33 +1,21 @@
-import os, time
+import requests as r
+from bs4 import BeautifulSoup
 
-print("aula de arquivos")
+print("-Aula de Scraping/Crawling-")
 
-if os.path.isfile("login.txt"):
-    print("cadastro ja existente")
-    time.sleep(1)
-    usuario = input("digite seu usuario: ")
-    senha = input("digite sua senha: ")
-
-    arquivo = open("login.txt", "r")
-    conteudo = arquivo.read()
-    time.sleep(.5)
-    arquivo.close()
-
-    partes = conteudo.split("|", 2)
-
-    if usuario == partes[0] and senha == partes[1]:
-        print("autenticado com sucesso!")
-        time.sleep(.3)
-        print(f"bem vindo {usuario}")
-    else:
-        print("usuario ou senha incorretos")
+try:
+    resultado = r.get("https://uol.com.br/start/esport")
+except:
+    print("Erro: não foi possivel acessar a página")
 else:
-    print("cadastro não existe, registre-se agora")
-    usuario = input("digite seu usuario: ")
-    senha = input("digite sua senha: ")
+    resposta = resultado.text
+    soup = BeautifulSoup(resposta, 'html.parser')
 
-    arquivo = open("login.txt", "w")
-    arquivo.write(f"{usuario}|{senha}")
-    arquivo.close()
+    print(soup.title.string)
 
-    print(f"usuario '{usuario}' cadastrado com sucesso")
+    lista = ["Neymar", "CSGO", "free fire", "pokemon", "cod"]
+    for paragrafo in soup.find_all('body'):
+        for palavra in lista:
+            for paragrafo_str in paragrafo.stripped_strings:
+                if palavra.upper() in str(paragrafo_str).upper():
+                    print(f"noticia encontrada: {paragrafo_str}")
